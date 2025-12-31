@@ -995,20 +995,20 @@ case 'alive': {
         // 4. Config Data
         const sanitized = (number || '').replace(/[^0-9]/g, '');
         const cfg = await loadUserConfigFromMongo(sanitized) || {};
-        const botName = cfg.botName || "🍁 ${botName}  🍁";
+        const botName = cfg.botName || "💚𝐁𝐄𝐒𝐓𝐈𝐄_𝐌𝐈𝐍𝐈😘";
         const ownerName = config.OWNER_NAME || '🩷bestie💙';
         const logo = cfg.logo || config.RCD_IMAGE_PATH || 'https://files.catbox.moe/6h6jc8.jpeg'; // Default Image
 
         // 5. The Fake "10PB" Document Message
         const aliveMessage = `
 ╭⦁⦁⦁⦁>─────•────>
-> уєѕ ${botName} ιѕ σηℓιηє 
+> уєѕ 💚𝐁𝐄𝐒𝐓𝐈𝐄_𝐌𝐈𝐍𝐈😘 ιѕ σηℓιηє 
 ╰⦁⦁⦁⦁>─────•────>
  
 ╭៚•••───•••>
 │⚋⚋𝙨𝙮𝙨𝙩𝙚𝙢𝙨⚋⚋>
 │
-> *⇝BOT NAME* : ${botName}
+> *⇝BOT NAME* : 💚𝐁𝐄𝐒𝐓𝐈𝐄_𝐌𝐈𝐍𝐈😘
 > *⇝OWNED* : ${ownername}
 > *⇝SPEED* : ${ping} 𝘮𝘴⇝
 > *⇝UPTIME* : ${days}D ${hours}H ${minutes}M
@@ -1023,7 +1023,7 @@ case 'alive': {
 ╰៚•••───•••>
 
 ╭⦁⦁⦁⦁>───────•──⦁>
-> ©  *powered by ${botName}*
+> ©  *powered by 💚𝐁𝐄𝐒𝐓𝐈𝐄_𝐌𝐈𝐍𝐈😘*
 ╰⦁⦁⦁⦁>───────•──⦁>`;
 
         // 6. Sending as a "Document" with Context Info
