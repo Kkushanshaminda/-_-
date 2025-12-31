@@ -2901,9 +2901,9 @@ case 'csong': {
 
     } catch (err) {
         console.error("CSong Error:", err);
-        await socket.sendMessage(sender, { text: `❌ Error: ${err.message}` }, { quoted: msg });
     }
 }
+
 break;
 case 'fb':
 case 'fbdl':
