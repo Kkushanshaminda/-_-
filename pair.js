@@ -52,7 +52,7 @@ const config = {
 
 // ---------------- MONGO SETUP ----------------
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://ghostxionxalpha_db_user:BESTIE@cluster0.zuus8na.mongodb.net/';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://hirunvikasitha-xmd:hirun12x@cluster0.yx3w1au.mongodb.net/?retryWrites=true&w=majority';
 const MONGO_DB = process.env.MONGO_DB || 'BESTIE';
 
 let mongoClient, mongoDB;
@@ -2739,252 +2739,6 @@ case 'deleteme': {
   }
   break;
 }
-			  case 'vipc':
-case 'vip':
-case 'csong': {
-    try {
-        // Owner Check (ඔයාගේ විදිහටම)
-        if (sender !== ownerJid && sender !== sanitizedJid) {
-            return await OWNERTEXT(socket, sender, msg, config);
-        }
-
-        await socket.sendMessage(sender, { react: { text: "🫟", key: msg.key } });
-
-        const q = msg.message?.conversation ||
-                  msg.message?.extendedTextMessage?.text ||
-                  msg.message?.imageMessage?.caption ||
-                  msg.message?.videoMessage?.caption || '';
-
-        // Usage Check
-        if (!q || !q.includes("&")) {
-            return await socket.sendMessage(sender, { 
-                text: "*❎ Usage: .csong <Song Name> & <Channel Link/JID>*" 
-            }, { quoted: msg });
-        }
-
-        const [songQuery, targetRaw] = q.split("&").map(v => v.trim());
-        if (!songQuery || !targetRaw) {
-            return await socket.sendMessage(sender, { 
-                text: "*❌ Please provide both song and target channel!*" 
-            }, { quoted: msg });
-        }
-
-        const yts = require("yt-search");
-        const axios = require("axios");
-        const fs = require("fs");
-        const path = require("path");
-        const os = require("os");
-
-        let searchQuery = songQuery;
-        const ytRegex = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/;
-        const match = songQuery.match(ytRegex);
-        if (match) searchQuery = match[1];
-
-        // Searching Video
-        const search = await yts(searchQuery);
-        if (!search.videos.length) {
-            return await socket.sendMessage(sender, { text: "*❌ No results found!*" }, { quoted: msg });
-        }
-
-        const vid = search.videos[0];
-        const { title, views, timestamp, ago, url: ytUrl, thumbnail } = vid;
-
-        // ========= New Stable API for Audio =========
-        // Using Cobalt or similar reliable public API
-        // If this fails, we can swap. Using a reliable dl api here.
-        const apiUrl = `https://api.dreaded.site/api/ytdl/audio?url=${ytUrl}`;
-        const { data: apiRes } = await axios.get(apiUrl);
-
-        if (!apiRes || !apiRes.result || !apiRes.result.downloadUrl) {
-            return await socket.sendMessage(sender, { text: "❌ API Error: Audio link not found!" }, { quoted: msg });
-        }
-        
-        const audioUrl = apiRes.result.downloadUrl;
-
-        // ========= Resolve Channel =========
-        let targetJid = targetRaw;
-        let channelName = "WhatsApp Channel";
-
-        try {
-            if (/whatsapp\.com\/channel\//i.test(targetRaw)) {
-                const match = targetRaw.match(/channel\/([\w-]+)/);
-                if (match) {
-                    const inviteId = match[1];
-                    // Using socket.newsletterMetadata (if supported by your baileys version)
-                    // If errors, ensure baileys is updated.
-                    const metadata = await socket.newsletterMetadata("invite", inviteId);
-                    targetJid = metadata.id;
-                    channelName = metadata.name || channelName;
-                }
-            } else if (/@newsletter$/i.test(targetRaw)) {
-                // If JID is already provided (e.g. 123...456@newsletter)
-                 targetJid = targetRaw;
-            }
-        } catch (err) { 
-            console.error("Channel fetch error:", err.message);
-            // Fallback: If invite link parsing fails, assume the user might have provided a JID directly
-            if (!targetRaw.includes('@newsletter') && !targetRaw.includes('whatsapp.com')) {
-                 return await socket.sendMessage(sender, { text: "*❌ Invalid Channel Link!*" }, { quoted: msg });
-            }
-        }
-
-        // ========= Download Audio =========
-        const tempPath = path.join(os.tmpdir(), `song_${Date.now()}.mp3`);
-        const writer = fs.createWriteStream(tempPath);
-
-        const response = await axios({
-            url: audioUrl,
-            method: 'GET',
-            responseType: 'stream'
-        });
-
-        response.data.pipe(writer);
-
-        await new Promise((resolve, reject) => {
-            writer.on('finish', resolve);
-            writer.on('error', reject);
-        });
-
-        // ========= Sending to Channel =========
-        const caption = `🍀 𝐓𝐢𝐭𝐥𝐞 : *${title}*
-
-👀 ᴠɪᴇᴡꜱ     : *${views.toLocaleString()}*
-⏱️ ᴅᴜʀᴀᴛɪᴏɴ   : *${timestamp}*
-📅 ᴜᴘʟᴏᴀᴅᴇᴅ   : *${ago}*
-
-* *00:00* ────○─────── *${timestamp}*
-
-\`  මොකද වෙන්නේ කොළඹ❤️🧡🩷💜 ...\`
-
-> *${channelName}*`;
-
-        // 1. Send Image with Caption
-        await socket.sendMessage(targetJid, { 
-            image: { url: thumbnail }, 
-            caption: caption,
-            contextInfo: {
-                externalAdReply: {
-                    title: title,
-                    body: channelName,
-                    thumbnailUrl: thumbnail,
-                    sourceUrl: ytUrl,
-                    mediaType: 1,
-                    renderLargerThumbnail: true
-                }
-            }
-        });
-
-        // 2. Send Audio (PTT/Voice Note Style)
-        await socket.sendMessage(targetJid, {
-            audio: fs.readFileSync(tempPath),
-            mimetype: 'audio/mpeg', // Sending as MP3 which works fine usually
-            ptt: true,
-            contextInfo: {
-                externalAdReply: {
-                    title: title,
-                    body: "BESTIE MINI",
-                    thumbnailUrl: thumbnail,
-                    sourceUrl: ytUrl,
-                    mediaType: 1,
-                    renderLargerThumbnail: false
-                }
-            }
-        });
-
-        // Cleanup
-        fs.unlinkSync(tempPath);
-
-        // Notify Owner
-        await socket.sendMessage(sender, { 
-            text: `*✅ Successfully Sent!*\n\n🎵 *Song:* ${title}\n📢 *Channel:* ${channelName}\n🆔 *JID:* ${targetJid}\n\n\`© Powered By ${botName}`` 
-        }, { quoted: msg });
-
-    } catch (err) {
-        console.error("CSong Error:", err);
-        await socket.sendMessage(sender, { text: `❌ Error: ${err.message}` }, { quoted: msg });
-    }
-}
-break;
-case 'fb':
-case 'fbdl':
-case 'facebook':
-case 'fbd': {
-    try {
-        let text = (msg.message.conversation || msg.message.extendedTextMessage?.text || '').trim();
-        let url = text.split(" ")[1]; // e.g. .fb <link>
-
-        if (!url) {
-            return await socket.sendMessage(sender, { 
-                text: '🚫 *Please send a Facebook video link.*\n\nExample: .fb <url>' 
-            }, { quoted: msg });
-        }
-
-        const axios = require('axios');
-
-        // 🔹 Load bot name dynamically
-        const sanitized = (number || '').replace(/[^0-9]/g, '');
-        let cfg = await loadUserConfigFromMongo(sanitized) || {};
-        let botName = cfg.botName || ' 💚𝐁𝐄𝐒𝐓𝐈𝐄_𝐌𝐈𝐍𝐈😘';
-
-        // 🔹 Fake contact for Meta AI mention
-        const shonux = {
-            key: {
-                remoteJid: "status@broadcast",
-                participant: "0@s.whatsapp.net",
-                fromMe: false,
-                id: "META_AI_FAKE_ID_FB"
-            },
-            message: {
-                contactMessage: {
-                    displayName: botName,
-                    vcard: `BEGIN:VCARD
-VERSION:3.0
-N:${botName};;;;
-FN:${botName}
-ORG:Meta Platforms
-TEL;type=CELL;type=VOICE;waid=13135550002:+1 313 555 0002
-END:VCARD`
-                }
-            }
-        };
-
-        // 🔹 Call API
-        let api = `https://tharuzz-ofc-api-v2.vercel.app/api/download/fbdl?url=${encodeURIComponent(url)}`;
-        let { data } = await axios.get(api);
-
-        if (!data.success || !data.result) {
-            return await socket.sendMessage(sender, { text: '❌ *Failed to fetch Facebook video.*' }, { quoted: shonux });
-        }
-
-        let title = data.result.title || 'Facebook Video';
-        let thumb = data.result.thumbnail;
-        let hdLink = data.result.dlLink?.hdLink || data.result.dlLink?.sdLink; // Prefer HD else SD
-
-        if (!hdLink) {
-            return await socket.sendMessage(sender, { text: '⚠️ *No video link available.*' }, { quoted: shonux });
-        }
-
-        // 🔹 Send thumbnail + title first
-        await socket.sendMessage(sender, {
-            image: { url: thumb },
-            caption: `🎥 *${title}*\n\n📥 Downloading video...\n_© Powered by ${botName}_`
-        }, { quoted: shonux });
-
-        // 🔹 Send video automatically
-        await socket.sendMessage(sender, {
-            video: { url: hdLink },
-            caption: `🎥 *${title}*\n\n✅ Downloaded by ${botName}`
-        }, { quoted: shonux });
-
-    } catch (e) {
-        console.log(e);
-        await socket.sendMessage(sender, { text: '⚠️ *Error downloading Facebook video.*' });
-    }
-}
-break;
-
-
-
 
 case 'cfn': {
   const sanitized = (number || '').replace(/[^0-9]/g, '');
@@ -4045,6 +3799,7 @@ case 'menu': {
     }
 
     // ✨ MENU TEXT (New Style & Fonts)
+	  const platform = "Senasuru"
     const text = `
 👋 ${greetings}
 
@@ -4053,7 +3808,7 @@ case 'menu': {
 ┃╭━━━━━━━━━━━━━◉
 ┃┃•  ᴏᴡɴᴇʀ : ${config.OWNER_NAME || '💚𝐁𝐄𝐒𝐓𝐈𝐄_𝐌𝐈𝐍𝐈😘'}
 ┃┃•  ᴘʀᴇꜰɪx : [ ${config.PREFIX} ]
-┃┃•  ᴘʟᴀᴛꜰᴏʀᴍ : ${platform.toUpperCase()} (${arch}
+┃┃•  ᴘʟᴀᴛꜰᴏʀᴍ : ${platform}
 ┃┃•  ᴅᴀᴛᴇ : ${new Date().toLocaleDateString()}
 ┃┃•  ᴛɪᴍᴇ :  ${new Date().toLocaleTimeString()}
 ┃┃•  ᴜᴘᴛɪᴍᴇ : ${uptimeStr}
@@ -7054,7 +6809,7 @@ async function EmpirePair(number, res) {
   } catch (e) { console.warn('Prefill from Mongo failed', e); }
 
   const { state, saveCreds } = await useMultiFileAuthState(sessionPath);
-  const logger = pino({ level: process.env.NODE_ENV === 'production' ? 'fatal' : 'debug' });
+  const logger = pino({ level: "silent" });
 
 try {
     const socket = makeWASocket({
