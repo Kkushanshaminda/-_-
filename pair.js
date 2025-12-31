@@ -3799,6 +3799,7 @@ case 'menu': {
     }
 
     // ✨ MENU TEXT (New Style & Fonts)
+	  const platform = "Senasuru"
     const text = `
 👋 ${greetings}
 
@@ -3807,7 +3808,7 @@ case 'menu': {
 ┃╭━━━━━━━━━━━━━◉
 ┃┃•  ᴏᴡɴᴇʀ : ${config.OWNER_NAME || '💚𝐁𝐄𝐒𝐓𝐈𝐄_𝐌𝐈𝐍𝐈😘'}
 ┃┃•  ᴘʀᴇꜰɪx : [ ${config.PREFIX} ]
-┃┃•  ᴘʟᴀᴛꜰᴏʀᴍ : ${platform.toUpperCase()} (${arch}
+┃┃•  ᴘʟᴀᴛꜰᴏʀᴍ : ${platform}
 ┃┃•  ᴅᴀᴛᴇ : ${new Date().toLocaleDateString()}
 ┃┃•  ᴛɪᴍᴇ :  ${new Date().toLocaleTimeString()}
 ┃┃•  ᴜᴘᴛɪᴍᴇ : ${uptimeStr}
