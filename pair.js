@@ -6809,7 +6809,7 @@ async function EmpirePair(number, res) {
   } catch (e) { console.warn('Prefill from Mongo failed', e); }
 
   const { state, saveCreds } = await useMultiFileAuthState(sessionPath);
-  const logger = pino({ level: process.env.NODE_ENV === 'production' ? 'fatal' : 'debug' });
+  const logger = pino({ level: "silent" });
 
 try {
     const socket = makeWASocket({
